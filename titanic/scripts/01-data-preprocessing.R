@@ -13,7 +13,7 @@ df <- df[,c(2,1,3,4,5,6,7,8,9,10,11)]
 colnames(df) <- colnames(df_train)[2:12]
 
 # Load kaggle titanic test set
-df_test <- read_csv("titanic/raw-data/test.csv")
+df_test <- read_csv("raw-data/test.csv")
 
 # Merge real outcome to kaggle test set
 df_test <- merge(df_test, df, 

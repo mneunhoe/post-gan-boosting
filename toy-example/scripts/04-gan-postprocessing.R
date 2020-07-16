@@ -1,13 +1,7 @@
 source("scripts/00-setup.R")
 source("../post_GAN_functions.R")
 
-data <-
-  read.csv(
-    "gan-input/gaussian_df_z.csv",
-    header = T
-  )
-data <- as.matrix(data)
-
+gaussian_df_z <- as.matrix(read.csv("gan-input/gaussian_df_z.csv"))
 
 # Define function that generates data from all four approaches
 # directly from the stored weights
@@ -21,13 +15,14 @@ gen_synth_25_gaussians <-
            n_generators = 50,
            steps = 100,
            MW_epsilon = 0.1,
-           last_model = 5000,
+           last_model_PGB = 12250,
+           last_model_GAN = 19000,
            n_samples = 2500,
            window = NULL,
            MW_init = F,
            run = 1,
            GPU = 0L,
-           data) {
+           data = gaussian_df_z) {
     require(tensorflow)
     require(zeallot)
     require(reticulate)
@@ -46,9 +41,9 @@ gen_synth_25_gaussians <-
     
     # Load meta graph and restore weights
     saver <-
-      tf$train$import_meta_graph(paste0(model_path, last_model, ".meta"))
+      tf$train$import_meta_graph(paste0(model_path, last_model_PGB, ".meta"))
     
-    ids <- c(1:last_model)[(1:last_model %% 5 == 0)][]
+    ids <- c(1:last_model_PGB)[(1:last_model_PGB %% 5 == 0)][]
 
     last_ids <- ids[(length(ids) - (n_generators - 1)):length(ids)]
     graph <- tf$get_default_graph()
@@ -182,7 +177,7 @@ gen_synth_25_gaussians <-
     
     # Sample from last Generator (for comparison)
     # Sample from last Generator
-    saver$restore(sess, paste0(model_path, last_model))
+    saver$restore(sess, paste0(model_path, last_model_GAN))
     
     # Sample 50,000 examples from last Generator for DRS to work
     sample <-
@@ -246,13 +241,13 @@ res_dp <-
     Z_dim = 32,
     n_generators = 200,
     steps = steps,
-    MW_epsilon = 0.269,
-    last_model = 10000,
+    MW_epsilon = 0.199662,
+    last_model_PGB = 12250,
+    last_model_GAN = 19000,
     n_samples = 2000,
     window = NULL,
     MW_init = F,
-    run = 1,
-    data = data
+    run = 16
   )
 
 # Save results for summarizing later
@@ -265,12 +260,12 @@ res_nodp <-
     Z_dim = 32,
     n_generators = 200,
     steps = steps,
-    last_model = 10000,
+    last_model_PGB = 10000,
+    last_model_GAN = 10000,
     n_samples = 2000,
     window = NULL,
     MW_init = F,
-    run = 1,
-    data = data
+    run = 16
   )
 
 # Save results for summarizing

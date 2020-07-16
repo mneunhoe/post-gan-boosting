@@ -12,7 +12,8 @@ gen_synth_pums1940 <-
            n_generators = 50,
            steps = 100,
            MW_epsilon = 0.1,
-           last_model = 46780,
+           last_model_PGB = 46780,
+           last_model_GAN = 12670,
            n_samples = 2500,
            window = NULL,
            MW_init = T,
@@ -41,9 +42,9 @@ gen_synth_pums1940 <-
     sess <- tf$Session(config = config)
     
     saver <-
-      tf$train$import_meta_graph(paste0(model_path, last_model, ".meta"))
+      tf$train$import_meta_graph(paste0(model_path, last_model_PGB, ".meta"))
     
-    ids <- c(1:last_model)[(1:last_model %% 5 == 0)][]
+    ids <- c(1:last_model_PGB)[(1:last_model_PGB %% 5 == 0)][]
     length(ids)
     last_ids <- ids[(length(ids) - (n_generators - 1)):length(ids)]
     graph <- tf$get_default_graph()
@@ -182,7 +183,7 @@ gen_synth_pums1940 <-
     
     # Sample from last Generator
     
-    saver$restore(sess, paste0(model_path, last_model))
+    saver$restore(sess, paste0(model_path, last_model_GAN))
     
     sample <-
       sess$run(G_sample, feed_dict = dict(Z = sample_Z(total_samples, Z_dim)))
@@ -240,7 +241,7 @@ gan_list$input_z <- NULL
 
 m <- 1
 runs <- 1
-first_run <- 1
+first_run <- 2
 
 n_samples <- 5000
 steps <- 400
@@ -249,7 +250,8 @@ synth_pums1940_dp <-
   lapply(first_run:(first_run + runs - 1), function(run)
     lapply(1:m, function(x)
       gen_synth_pums1940(
-        last_model = 7920,
+        last_model_PGB = 7945,
+        last_model_GAN = 12655,
         n_generators = 150,
         n_samples = n_samples,
         steps = steps,
@@ -257,7 +259,7 @@ synth_pums1940_dp <-
         data = data,
         nmp = 1.55,
         Z_dim = 128,
-        MW_epsilon = 0.201
+        MW_epsilon = 0.20
       )))
 
 
@@ -266,7 +268,8 @@ synth_pums1940_nodp <-
     lapply(1:m, function(x)
       gen_synth_pums1940(
         dp = F,
-        last_model = 7920,
+        last_model_PGB = 7920,
+        last_model_GAN = 7920,
         n_generators = 150,
         n_samples = n_samples,
         steps = steps,

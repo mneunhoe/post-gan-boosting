@@ -12,12 +12,13 @@ gen_synth_2010_pums <-
            n_generators = 50,
            steps = 100,
            MW_epsilon = 0.1,
-           last_model = 46780,
+           last_model_PGB = 46780,
+           last_model_GAN = 46780,
            n_samples = 2500,
            window = NULL,
            MW_init = T,
            unweighted_MW = F,
-           run_id = 1,
+           run = 1,
            data = NULL,
            GPU = 0L,
            temp = 0.00001) {
@@ -42,9 +43,9 @@ gen_synth_2010_pums <-
     sess <- tf$Session(config = config)
     
     saver <-
-      tf$train$import_meta_graph(paste0(model_path, last_model, ".meta"))
+      tf$train$import_meta_graph(paste0(model_path, last_model_PGB, ".meta"))
     
-    ids <- c(1:last_model)[(1:last_model %% 5 == 0)][]
+    ids <- c(1:last_model_PGB)[(1:last_model_PGB %% 5 == 0)][]
     length(ids)
     last_ids <- ids[(length(ids) - (n_generators - 1)):length(ids)]
     graph <- tf$get_default_graph()
@@ -187,7 +188,7 @@ gen_synth_2010_pums <-
     
     # Sample from last Generator
     
-    saver$restore(sess, paste0(model_path, last_model))
+    saver$restore(sess, paste0(model_path, last_model_GAN))
     
     sample <-
       sess$run(G_sample, feed_dict = dict(Z = sample_Z(total_samples, Z_dim)))
@@ -247,14 +248,15 @@ gan_list$input_z <- NULL
 # Generate synthetic data from all four approaches
 synth_pums <-
   gen_synth_2010_pums(
-    last_model = 7445,
+    last_model_PGB = 7445,
+    last_model_GAN = 7445*3,
     n_generators = 150,
     n_samples = 5000,
     steps = 400,
-    run_id = 1,
+    run = 1,
     data = data,
     unweighted_MW = F,
-    MW_epsilon = 0.209,
+    MW_epsilon = 0.09,
     window = 150,
     nmp = 1.1,
     MW_init = T

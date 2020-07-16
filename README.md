@@ -1,10 +1,14 @@
 # Private post-GAN Boosting
 
-This is the code repository accompanying the paper Private post-GAN Boosting.
+This is the code repository accompanying the paper **Private post-GAN Boosting** by [Marcel Neunhoeffer](https://marcel-neunhoeffer.com), [Zhiwei Steven Wu](https://zstevenwu.com/) and [Cynthia Dwork](https://www.seas.harvard.edu/faculty?search=%22Cynthia%20Dwork%22#content).
+
+If you have any questions feel free to email [Marcel Neunhoeffer](mailto:mneunhoe@mail.uni-mannheim.de).
+
 
 *Abstract*:
 
 Differentially private GANs have proven to be a promising approach for generating realistic synthetic data without compromising the privacy of individuals. However, due to the privacy-protective noise introduced in the  training, the convergence of GANs becomes even more elusive, which often leads to poor utility in the output generator at the end of training. We propose Private **post-GAN boosting (Private PGB)**, a differentially private method that combines samples produced by the sequence of generators obtained during GAN training to create a high-quality synthetic dataset. Our method leverages the Private Multiplicative Weights method (Hardt and Rothblum, 2010) and the discriminator rejection sampling technique (Azadi et al., 2019) for reweighting generated samples, to obtain high quality synthetic data even in cases where GAN training does not converge.  We evaluate Private PGB on a Gaussian mixture dataset and two US Census datasets, and demonstrate that Private PGB improves upon the standard private GAN approach across a collection of quality measures. Finally, we provide a non-private variant of PGB that improves the data quality of standard GAN training.
+
 
 ## Code for the post-GAN Boosting algorithm
 
@@ -55,11 +59,9 @@ RStudio Server 1.3.776
 
 All necessary R libraries will be installed and loaded upon running the `00-setup.R` in an experiment.
 
-When first installing `tensorflow` in R, make sure to install version 1.15.0 with `install_tensorflow(version = "1.15.0")`. This only needs to be done once.
-
 ### Python Environment
 
-This GAN code was written and tested using `python 3.6.9`. All packages in the environment are documented in `requirements.txt`. You can create a new python environment with `python 3.6.9`, activate the environment and run `pip install -r requirements.txt`. This will get you ready to go.
+This GAN code was written and tested using `python 3.7.7`. All packages in the environment are documented in `requirements.txt`. You can create a new python environment with `python 3.7.7`, activate the environment and run `pip install -r requirements.txt`. This will get you ready to go.
 
 #### Installing tensorflow privacy
 If installing `tensorflow privacy` does not work with `pip install -r requirements.txt`, follow the instructions [here](https://github.com/tensorflow/privacy) to install it manually.

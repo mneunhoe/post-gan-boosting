@@ -14,7 +14,7 @@ gan_list$input_z <- NULL
 
 orig_data <- synth_to_orig(data, gan_list)
 
-tmp_data <- read.RDS("synthetic-output/res_df.RDS")
+tmp_data <- readRDS("synthetic-output/res_df.RDS")
 
 # Calculate pMSE
 
@@ -30,6 +30,8 @@ pmse_dp <-
     ))
 
 
+pmse_dp$sample$utilR
+round(sapply(pmse_dp, function(x) x$utilR), 3)
 
 my_table <-
   table(orig_data$race, orig_data$hispanic, orig_data$female)

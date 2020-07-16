@@ -6,9 +6,9 @@ from tensorflow_privacy.privacy.optimizers import dp_optimizer
 import random
 import pandas as pd
 
-runs = 10
+runs = 25
 first_run = 1
-GPU = 1
+GPU = 0
 
 filename = "gan-input/gan_input.csv"
 N = sum(1 for line in open(filename)) - 1
@@ -34,7 +34,7 @@ else:
   D_learning_rate = 0.001
 
 
-epochs = 200
+epochs = 350
 
 # DP declarations
 
@@ -199,7 +199,7 @@ for run in range(first_run, runs+1):
         os.makedirs('./models/run'+str(run))
 
 
-    saver = tf.train.Saver(tf.trainable_variables(), max_to_keep = 200)
+    saver = tf.train.Saver(tf.trainable_variables(), max_to_keep = 2000)
 
     steps_per_epoch = N // mb_size
 

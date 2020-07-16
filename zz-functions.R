@@ -1,6 +1,6 @@
 
 
-gan_input <- function(df, type, contrasts = F) {
+gan_input <- function(df, type, contrasts = F, means = NULL, sds = NULL) {
   if (ncol(df) != length(type)) {
     stop("A type needs to be specified for every column.")
   }
@@ -35,8 +35,12 @@ gan_input <- function(df, type, contrasts = F) {
   
   num_out <- out[, which(type_order == "num"), drop = F]
   
-  means <- apply(num_out, 2, mean, na.rm = T)
-  sds <- apply(num_out, 2, sd, na.rm = T)
+  
+  if(is.null(means)){
+    means <- apply(num_out, 2, mean, na.rm = T)
+    sds <- apply(num_out, 2, sd, na.rm = T)
+  }
+  
   num_z <- as.matrix(sweep(sweep(num_out, 2, means), 2, sds, "/"))
   
   out_z[, which(type_order == "num")] <- num_z
@@ -111,12 +115,12 @@ gan_pmse <- function(x,
                      true_data,
                      method = "cart",
                      cp = 0.05,
-                     n = 3000, seed = 1234,
+                     n = 3000, seed = 200605,
                      ...) {
   set.seed(seed)
   n_true <- nrow(true_data)
   n_synth <- nrow(x)
-  if (n_synth >= n & n_true >=n_synth) {
+  if (n_synth >= n) {
     a <- data.frame(true_data[sample(1:n_true, n),])
     b <- data.frame(x[sample(1:n_synth, n),])
     colnames(b) <- colnames(a)

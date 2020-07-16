@@ -2,10 +2,16 @@ source("scripts/00-setup.R")
 source("../zz-functions.R")
 
 # Load synthetic samples
-tmp <- readRDS("synthetic-output/res_df.RDS")
+runs <- 20
 
-tmp_data_dp <- tmp$dp
-tmp_data_nodp <- tmp$nodp
+tmp_data_dp <- list()
+tmp_data_nodp <- list()
+for(i in 1:runs){
+tmp <- readRDS(paste0("synthetic-output/res_df_",i,".RDS"))
+tmp_data_dp[[i]] <- tmp$dp[[1]]
+tmp_data_nodp[[i]] <- tmp$nodp[[1]]
+}
+
 
 # Load real data
 gan_list <- readRDS("gan-input/gan_list.RDS")
@@ -26,7 +32,7 @@ ff <-
   Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked
 
 
-set.seed(200130)
+set.seed(200611)
 
 # Define function to train random forest models and calculate scores
 rf_titanic_results <-
@@ -253,7 +259,7 @@ xgb_titanic_results <-
           mm_test <- model.matrix(ff, mf_test)
           
           predictions <-
-            predict(rf, type = "prob", newdata = mm_test[, 2:ncol(mf)])
+            predict(rf, type = "prob", newdata = mm_test[, 2:ncol(mf_test)])
           sel <- !is.na(predictions)
           res_real <-
             table(predictions > 0.5,
@@ -314,20 +320,81 @@ xgb_res_dp <-
 
 # Summarize results in one table
 res <- rbind(t(sapply(logit_res_nodp, function(x)
-  apply(x, 3, mean))),
+  apply(x, 3, median))),
   t(sapply(rf_res_nodp, function(x)
-    apply(x, 3, mean))),
+    apply(x, 3, median))),
   t(sapply(xgb_res_nodp, function(x)
-    apply(x, 3, mean))),
+    apply(x, 3, median))),
   
   t(sapply(logit_res_dp, function(x)
-    apply(x, 3, mean))),
+    apply(x, 3, median))),
   t(sapply(rf_res_dp, function(x)
-    apply(x, 3, mean))),
+    apply(x, 3, median))),
   t(sapply(xgb_res_dp, function(x)
-    apply(x, 3, mean))))
+    apply(x, 3, median))))
 
 
 colnames(res) <- c("GAN", "DRS", "PGB", "PGB+DRS")
 rownames(res) <- rep(c("Accuracy", "ROC AUC", "PR AUC"), 6)
 knitr::kable(round(res, 3), "latex", booktabs = T)
+
+
+res_sd <- rbind(t(sapply(logit_res_nodp, function(x)
+  apply(x, 3, sd))),
+  t(sapply(rf_res_nodp, function(x)
+    apply(x, 3, sd))),
+  t(sapply(xgb_res_nodp, function(x)
+    apply(x, 3, sd))),
+  
+  t(sapply(logit_res_dp, function(x)
+    apply(x, 3, sd))),
+  t(sapply(rf_res_dp, function(x)
+    apply(x, 3, sd))),
+  t(sapply(xgb_res_dp, function(x)
+    apply(x, 3, sd))))
+
+
+colnames(res_sd) <- c("GAN", "DRS", "PGB", "PGB+DRS")
+rownames(res_sd) <- rep(c("Accuracy", "ROC AUC", "PR AUC"), 6)
+knitr::kable(round(res_sd, 3), "latex", booktabs = T)
+
+
+tmp_data_real <- list(list(list(orig_data,
+                                orig_data,
+                                orig_data,
+                                orig_data)))
+
+xgb_res_real <-
+  xgb_titanic_results(
+    tmp_data = tmp_data_real,
+    runs = 1,
+    m = 1,
+    test_data = test_data
+  )
+rf_res_real <-
+  rf_titanic_results(
+    tmp_data = tmp_data_real,
+    runs = 1,
+    m = 1,
+    test_data = test_data
+  )
+
+logit_res_real <-
+  logit_titanic_results(
+    tmp_data = tmp_data_real,
+    runs = 1,
+    m = 1,
+    test_data = test_data
+  )
+
+
+real_res <- rbind(t(sapply(logit_res_real, function(x)
+  apply(x, 3, mean))),
+  t(sapply(rf_res_real, function(x)
+    apply(x, 3, mean))),
+  t(sapply(xgb_res_real, function(x)
+    apply(x, 3, mean))))[,1]
+
+knitr::kable(cbind(names(real_res), (round(real_res, 3))), "latex", booktabs = T)
+
+res

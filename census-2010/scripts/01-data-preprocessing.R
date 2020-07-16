@@ -14,7 +14,7 @@ data <- read_ipums_micro(ddi)
 
 # Subset to California
 data_cal <- data[data$US2010G_STATE == "06",]
-
+rm(data)
 # Collect attributes for training data
 data_gan <- data.frame(matrix(nrow = nrow(data_cal)))
 
@@ -29,7 +29,7 @@ data_gan$race <- factor(data_cal$US2010G_RACESHORT)
 
 data_gan$puma <- factor(data_cal$US2010G_PUMA)
 
-
+rm(data_cal)
 # Define types for gumbel-softmax trick
 types <- c("bin", "num", "fac", "fac", "fac")
 

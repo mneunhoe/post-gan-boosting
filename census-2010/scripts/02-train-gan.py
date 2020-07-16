@@ -1,16 +1,18 @@
 import tensorflow as tf
+
 import numpy as np
 import os
 import time
 from tensorflow_privacy.privacy.optimizers import dp_optimizer
+import tensorflow_probability as tfp
 import random
 import pandas as pd
 
-runs = 1
+runs = 3
 
-first_run = 1
+first_run = 4
 
-GPU =  1
+GPU =  0
 
 filename = "gan-input/gan_input.csv"
 N = sum(1 for line in open(filename)) - 1
@@ -29,7 +31,7 @@ Z_dim = 512
 mb_size = 500
 D_learning_rate = 0.01
 
-epochs = 2
+epochs = 10
 
 # DP declarations
 
@@ -41,10 +43,10 @@ noise_multiplier = 1.1
 def xavier_init(size):
     in_dim = size[0]
     xavier_stddev = 1. / tf.sqrt(in_dim / 2.)
-    return tf.random_normal(shape=size, stddev=xavier_stddev)
+    return tf.random.normal(shape=size, stddev=xavier_stddev)
 
 
-X = tf.placeholder(tf.float32, shape=[None, Dim])
+X = tf.compat.v1.placeholder(tf.float32, shape=[None, Dim])
 
 D_W1 = tf.Variable(xavier_init([Dim, 256]), name = "D_W1")
 D_b1 = tf.Variable(tf.zeros(shape=[256]), name = "D_b1")
@@ -61,7 +63,7 @@ D_b2 = tf.Variable(tf.zeros(shape=[1]), name = "D_b2")
 theta_D = [D_W1, D_W1_1, D_W1_2, D_W2, D_b1, D_b1_1, D_b1_2, D_b2]
 
 
-Z = tf.placeholder(tf.float32, shape=[None, Z_dim])
+Z = tf.compat.v1.placeholder(tf.float32, shape=[None, Z_dim])
 
 G_W1 = tf.Variable(xavier_init([Z_dim, 256]), name = "G_W1")
 G_b1 = tf.Variable(tf.zeros(shape=[256]), name = "G_b1")
@@ -96,19 +98,19 @@ def generator(z, temperature):
     G_age_logits = G_log_prob[:, 0:1]
     
     G_sex_logits = tf.concat([tf.zeros_like(G_log_prob[:, 0:1]), G_log_prob[:, 1:2]], 1)
-    G_sex_binary_dist = tf.contrib.distributions.RelaxedOneHotCategorical(temperature, logits = G_sex_logits)
+    G_sex_binary_dist = tfp.distributions.RelaxedOneHotCategorical(temperature, logits = G_sex_logits)
     G_sex_binary = G_sex_binary_dist.sample()
     
     G_hispan_logits = G_log_prob[:, 2:27]
-    G_hispan_multinom_dist = tf.contrib.distributions.RelaxedOneHotCategorical(temperature, logits = G_hispan_logits)
+    G_hispan_multinom_dist = tfp.distributions.RelaxedOneHotCategorical(temperature, logits = G_hispan_logits)
     G_hispan_multinom = G_hispan_multinom_dist.sample()
     
     G_race_logits = G_log_prob[:, 27:38]
-    G_race_multinom_dist = tf.contrib.distributions.RelaxedOneHotCategorical(temperature, logits = G_race_logits)
+    G_race_multinom_dist = tfp.distributions.RelaxedOneHotCategorical(temperature, logits = G_race_logits)
     G_race_multinom = G_race_multinom_dist.sample()
     
     G_puma_logits = G_log_prob[:, 38:303]
-    G_puma_multinom_dist = tf.contrib.distributions.RelaxedOneHotCategorical(temperature, logits = G_puma_logits)
+    G_puma_multinom_dist = tfp.distributions.RelaxedOneHotCategorical(temperature, logits = G_puma_logits)
     G_puma_multinom = G_puma_multinom_dist.sample()
     
     G_prob = tf.concat([G_age_logits, G_sex_binary[:, 1:], G_hispan_multinom[:, 0:], G_race_multinom[:, 0:], G_puma_multinom[:, 0:]], 1)
@@ -146,7 +148,7 @@ D_optimizer = dp_optimizer.DPAdamGaussianOptimizer(
         noise_multiplier=noise_multiplier,
         ledger=False)
 
-D_solver = D_optimizer.minimize(loss=vector_D_loss, var_list = theta_D, global_step=tf.train.get_global_step())
+D_solver = D_optimizer.minimize(loss=vector_D_loss, var_list = theta_D, global_step=tf.compat.v1.train.get_global_step())
 
 from tensorflow_privacy.privacy.analysis import rdp_accountant
 
@@ -161,9 +163,9 @@ def compute_epsilon(steps):
                                               target_delta=1/(2*N))
   return eps
 
-G_solver = tf.train.AdamOptimizer().minimize(G_loss, var_list=theta_G)
+G_solver = tf.compat.v1.train.AdamOptimizer().minimize(G_loss, var_list=theta_G)
 
-config = tf.ConfigProto(device_count = {'GPU': GPU})
+config = tf.compat.v1.ConfigProto(device_count = {'GPU': GPU})
 
 for run in range(first_run, runs+1):
 	sess = tf.Session(config = config)
@@ -173,7 +175,7 @@ for run in range(first_run, runs+1):
 	    os.makedirs('./models/run'+str(run))
 
 	i = 0
-	saver = tf.train.Saver(tf.trainable_variables(), max_to_keep = 200)
+	saver = tf.train.Saver(tf.trainable_variables(), max_to_keep = 15000)
 
 	steps_per_epoch = N // mb_size
 
@@ -187,7 +189,7 @@ for run in range(first_run, runs+1):
 	        _, G_loss_curr = sess.run([G_solver, G_loss], feed_dict={Z: Z_mb})
 	        g_step = epoch*steps_per_epoch+step-steps_per_epoch
 	        if g_step % 5 == 0:
-	            saver.save(sess, './gan_final_models/run'+str(run)+'/nmp-' + str(noise_multiplier) +'/pums2010', global_step = g_step)
+	            saver.save(sess, './models/run'+str(run)+'/nmp-' + str(noise_multiplier) +'/pums2010', global_step = g_step)
 	            print('Step: {}'.format(g_step))
 	            D_loss_ep = np.mean(D_loss_curr)
 	            print('D loss: {:.4}'. format(D_loss_ep))

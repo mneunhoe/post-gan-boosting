@@ -84,7 +84,7 @@ cart_pmse_dp <-
   lapply(tmp_data_dp, function(run)
     lapply(run, function(x)
       lapply(x, function(y)
-        gan_pmse(y, orig_data, cp = 0.001))))
+        gan_pmse(y, orig_data, cp = 0.0001))))
 
 
 lapply(cart_pmse_dp, function(run)
@@ -193,7 +193,7 @@ dev.off()
 
 
 # Load original training and test data
-train_test <- readRDS("pums1940/processed-data/train_test.RDS")
+train_test <- readRDS("processed-data/train_test.RDS")
 
 train_df <- synth_to_orig(train_test$train$input_z, gan_list)
 test_df <- synth_to_orig(train_test$test$input_z, gan_list)
@@ -266,7 +266,7 @@ real_errors_dp <- lapply(reg_dp, function(run)
 
 
 
-error_mat <- cbind(unlist(synth_errors), unlist(real_errors))
+#error_mat <- cbind(unlist(synth_errors), unlist(real_errors))
 
 
 

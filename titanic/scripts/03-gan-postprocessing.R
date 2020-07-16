@@ -12,7 +12,8 @@ gen_synth_titanic <-
            n_generators = 50,
            steps = 100,
            MW_epsilon = 0.1,
-           last_model = 46780,
+           last_model_PGB = 46780,
+           last_model_GAN = 46780,
            n_samples = 2500,
            window = NULL,
            MW_init = T,
@@ -42,9 +43,9 @@ gen_synth_titanic <-
     sess <- tf$Session(config = config)
     
     saver <-
-      tf$train$import_meta_graph(paste0(model_path, last_model, ".meta"))
+      tf$train$import_meta_graph(paste0(model_path, last_model_PGB, ".meta"))
     
-    ids <- c(1:last_model)[(1:last_model %% 5 == 0)][]
+    ids <- c(1:last_model_PGB)[(1:last_model_PGB %% 5 == 0)][]
     length(ids)
     last_ids <- ids[(length(ids) - (n_generators - 1)):length(ids)]
     graph <- tf$get_default_graph()
@@ -181,7 +182,7 @@ gen_synth_titanic <-
       
       saver$restore(sess, paste0(model_path, i))
       
-      samp_sel <- sample(1:nrow(data), 2000)
+      samp_sel <- sample(1:nrow(data), nrow(data))
       tmp_mean <- mean(sess$run(D_real, feed_dict = dict(X = data[samp_sel,])))
       
       D_m_real <- c(D_m_real, tmp_mean)
@@ -193,7 +194,7 @@ gen_synth_titanic <-
     
     # Sample from last Generator
     
-    saver$restore(sess, paste0(model_path, last_model))
+    saver$restore(sess, paste0(model_path, last_model_GAN))
     
     sample <-
       sess$run(G_sample, feed_dict = dict(Z = sample_Z(total_samples, Z_dim)))
@@ -249,15 +250,18 @@ data <- as.matrix(gan_list$input_z)
 gan_list$input <- NULL
 gan_list$input_z <- NULL
 
-m <- 5
-runs <- 10
-first_run <- 1
+m <- 1
+runs <- 1
+
+for(i in 19:20){
+first_run <- i
 
 synth_titanic_dp <-
   lapply(first_run:(first_run + runs - 1), function(run)
     lapply(1:m, function(x)
       gen_synth_titanic(
-        last_model = 2600,
+        last_model_PGB = 2960,
+        last_model_GAN = 4535,
         n_generators = 100,
         n_samples = 5000,
         steps = 400,
@@ -265,7 +269,7 @@ synth_titanic_dp <-
         data = data,
         nmp = 10,
         Z_dim = 64,
-        MW_epsilon = 0.453
+        MW_epsilon = 0.4
       )))
 
 
@@ -275,7 +279,8 @@ synth_titanic_nodp <-
     lapply(1:m, function(x)
       gen_synth_titanic(
         dp = F,
-        last_model = 2600,
+        last_model_PGB= 4550,
+        last_model_GAN = 4550,
         n_generators = 100,
         n_samples = 5000,
         steps = 400,
@@ -300,4 +305,7 @@ tmp_data_dp <-
         synth_to_orig(y, gan_list))))
 
 # Store synthetic data from all approaches
-saveRDS(list(dp = tmp_data_dp, nodp = tmp_data_nodp), "synthetic-output/res_df.RDS")
+saveRDS(list(dp = tmp_data_dp, nodp = tmp_data_nodp), paste0("synthetic-output/res_df_",i,".RDS"))
+gc()
+}
+

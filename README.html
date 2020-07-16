@@ -367,7 +367,8 @@ summary {
 
 <div id="private-post-gan-boosting" class="section level1">
 <h1>Private post-GAN Boosting</h1>
-<p>This is the code repository accompanying the paper Private post-GAN Boosting.</p>
+<p>This is the code repository accompanying the paper <strong>Private post-GAN Boosting</strong> by <a href="https://marcel-neunhoeffer.com">Marcel Neunhoeffer</a>, <a href="https://zstevenwu.com/">Zhiwei Steven Wu</a> and <a href="https://www.seas.harvard.edu/faculty?search=%22Cynthia%20Dwork%22#content">Cynthia Dwork</a>.</p>
+<p>If you have any questions feel free to email <a href="mailto:mneunhoe@mail.uni-mannheim.de">Marcel Neunhoeffer</a>.</p>
 <p><em>Abstract</em>:</p>
 <p>Differentially private GANs have proven to be a promising approach for generating realistic synthetic data without compromising the privacy of individuals. However, due to the privacy-protective noise introduced in the training, the convergence of GANs becomes even more elusive, which often leads to poor utility in the output generator at the end of training. We propose Private <strong>post-GAN boosting (Private PGB)</strong>, a differentially private method that combines samples produced by the sequence of generators obtained during GAN training to create a high-quality synthetic dataset. Our method leverages the Private Multiplicative Weights method (Hardt and Rothblum, 2010) and the discriminator rejection sampling technique (Azadi et al., 2019) for reweighting generated samples, to obtain high quality synthetic data even in cases where GAN training does not converge. We evaluate Private PGB on a Gaussian mixture dataset and two US Census datasets, and demonstrate that Private PGB improves upon the standard private GAN approach across a collection of quality measures. Finally, we provide a non-private variant of PGB that improves the data quality of standard GAN training.</p>
 <div id="code-for-the-post-gan-boosting-algorithm" class="section level2">
@@ -413,7 +414,7 @@ RStudio Server 1.3.776</code></pre>
 </div>
 <div id="python-environment" class="section level3">
 <h3>Python Environment</h3>
-<p>This GAN code was written and tested using <code>python 3.6.9</code>. All packages in the environment are documented in <code>requirements.txt</code>. You can create a new python environment with <code>python 3.6.9</code>, activate the environment and run <code>pip install -r requirements.txt</code>. This will get you ready to go.</p>
+<p>This GAN code was written and tested using <code>python 3.7.7</code>. All packages in the environment are documented in <code>requirements.txt</code>. You can create a new python environment with <code>python 3.7.7</code>, activate the environment and run <code>pip install -r requirements.txt</code>. This will get you ready to go.</p>
 <div id="installing-tensorflow-privacy" class="section level4">
 <h4>Installing tensorflow privacy</h4>
 <p>If installing <code>tensorflow privacy</code> does not work with <code>pip install -r requirements.txt</code>, follow the instructions <a href="https://github.com/tensorflow/privacy">here</a> to install it manually.</p>

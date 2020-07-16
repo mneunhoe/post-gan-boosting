@@ -5,16 +5,16 @@ import time
 from tensorflow_privacy.privacy.optimizers import dp_optimizer
 import pandas as pd
 
-first_run = 1
-runs = 1
+first_run = 13
+runs = 25
 
-GPU = 1
+GPU = 0
 
 filename = 'gan-input/gan_input.csv'
 
 data = pd.read_csv(filename, header = 0)
 
-dp = True
+dp = False
 
 N = np.shape(data)[0]
 Dim = np.shape(data)[1]
@@ -30,6 +30,7 @@ Z_dim = 128
 
 
 epochs = 20
+# epochs = 32
 
 # DP declarations
 
@@ -190,7 +191,7 @@ for run in range(first_run, runs+1):
         os.makedirs('./models/run'+str(run))
 
     
-    saver = tf.train.Saver(tf.trainable_variables(), max_to_keep = 200)
+    saver = tf.train.Saver(tf.trainable_variables(), max_to_keep = 1200)
 
     steps_per_epoch = N // mb_size
 
