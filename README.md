@@ -1,6 +1,6 @@
 # Private post-GAN Boosting
 
-This is the code repository accompanying the paper **Private post-GAN Boosting** by [Marcel Neunhoeffer](https://marcel-neunhoeffer.com), [Zhiwei Steven Wu](https://zstevenwu.com/) and [Cynthia Dwork](https://www.seas.harvard.edu/faculty?search=%22Cynthia%20Dwork%22#content).
+This is the code repository accompanying the paper **Private post-GAN Boosting** by [Marcel Neunhoeffer](http://marcel-neunhoeffer.com), [Zhiwei Steven Wu](https://zstevenwu.com/) and [Cynthia Dwork](https://www.seas.harvard.edu/faculty?search=%22Cynthia%20Dwork%22#content).
 
 If you have any questions feel free to email [Marcel Neunhoeffer](mailto:mneunhoe@mail.uni-mannheim.de).
 
